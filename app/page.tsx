@@ -21,7 +21,9 @@ export default function Home() {
   const [showAnswer, setShowAnswer] = useState(false)
   const [showForm, setShowForm] = useState(false)
   const [showBulkForm, setShowBulkForm] = useState(false)
+  const [showEditForm, setShowEditForm] = useState(false)
   const [newCard, setNewCard] = useState({ question: '', answer: '', category: '' })
+  const [editCard, setEditCard] = useState({ id: 0, question: '', answer: '', category: '' })
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
   const [bulkJson, setBulkJson] = useState('')
   const [bulkError, setBulkError] = useState('')
@@ -117,6 +119,38 @@ export default function Home() {
     } catch (error) {
       console.error('Error deleting all flashcards:', error)
     }
+  }
+
+  const handleEditCard = async (e: React.FormEvent) => {
+    e.preventDefault()
+    try {
+      await fetch(`/api/flashcards/${editCard.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          question: editCard.question,
+          answer: editCard.answer,
+          category: editCard.category
+        })
+      })
+      setShowEditForm(false)
+      fetchFlashcards()
+    } catch (error) {
+      console.error('Error updating flashcard:', error)
+    }
+  }
+
+  const startEdit = () => {
+    const current = filteredCards[currentIndex]
+    setEditCard({
+      id: current.id,
+      question: current.question,
+      answer: current.answer,
+      category: current.category || ''
+    })
+    setShowEditForm(true)
+    setShowForm(false)
+    setShowBulkForm(false)
   }
 
   const renderContent = (text: string) => (
@@ -323,13 +357,71 @@ export default function Home() {
             </button>
           </div>
 
-          <button onClick={() => handleDeleteCard(filteredCards[currentIndex].id)} className="delete-btn">
-            🗑️ Delete Card
-          </button>
+          <div className="action-buttons">
+            <button onClick={startEdit} className="edit-btn">
+              ✏️ Edit Card
+            </button>
+            <button onClick={() => handleDeleteCard(filteredCards[currentIndex].id)} className="delete-btn">
+              🗑️ Delete Card
+            </button>
+          </div>
         </div>
       ) : (
         <div className="empty-state">
-          <p>Made by Jerry (actually ChatGPT).</p>
+          <p>No flashcards yet! Click "Add Card" to create your first one.</p>
+        </div>
+      )}
+
+      {showEditForm && (
+        <div className="modal-overlay" onClick={() => setShowEditForm(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <h2>Edit Flashcard</h2>
+            <form onSubmit={handleEditCard} className="flashcard-form">
+              <div className="form-group">
+                <label>Question (Markdown & LaTeX supported)</label>
+                <textarea
+                  value={editCard.question}
+                  onChange={(e) => setEditCard({ ...editCard, question: e.target.value })}
+                  required
+                />
+                {editCard.question && (
+                  <div className="preview">
+                    <strong>Preview:</strong>
+                    <div>{renderContent(editCard.question)}</div>
+                  </div>
+                )}
+              </div>
+              <div className="form-group">
+                <label>Answer (Markdown & LaTeX supported)</label>
+                <textarea
+                  value={editCard.answer}
+                  onChange={(e) => setEditCard({ ...editCard, answer: e.target.value })}
+                  required
+                />
+                {editCard.answer && (
+                  <div className="preview">
+                    <strong>Preview:</strong>
+                    <div>{renderContent(editCard.answer)}</div>
+                  </div>
+                )}
+              </div>
+              <div className="form-group">
+                <label>Category (optional)</label>
+                <input
+                  type="text"
+                  value={editCard.category}
+                  onChange={(e) => setEditCard({ ...editCard, category: e.target.value })}
+                  placeholder="E.g., Math, Science, History"
+                />
+              </div>
+              <div className="modal-buttons">
+                <button type="submit" className="submit-btn">Save Changes</button>
+                <button type="button" onClick={() => setShowEditForm(false)} className="cancel-btn">
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </div>
