@@ -263,7 +263,7 @@ export default function Home() {
         </div>
       ) : (
         <div className="empty-state">
-          <p>No flashcards yet! Click "Add Card" to create your first one.</p>
+          <p>Made by Jerry (actually ChatGPT).</p>
         </div>
       )}
     </div>
