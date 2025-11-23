@@ -28,9 +28,9 @@ export async function POST(request: Request) {
     }
 
     // Single flashcard
-    const { question, answer } = body
+    const { question, answer, category } = body
     const flashcard = await prisma.flashcard.create({
-      data: { question, answer }
+      data: { question, answer, category }
     })
     return NextResponse.json(flashcard, { status: 201 })
   } catch (error) {
