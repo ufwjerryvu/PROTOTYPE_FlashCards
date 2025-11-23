@@ -59,7 +59,8 @@ body {
 }
 
 .add-btn,
-.bulk-btn {
+.bulk-btn,
+.shuffle-btn {
   padding: 0.75rem 1.5rem;
   font-size: 1rem;
   font-weight: 600;
@@ -77,8 +78,14 @@ body {
   box-shadow: 0 4px 15px rgba(240, 147, 251, 0.4);
 }
 
+.shuffle-btn {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  box-shadow: 0 4px 15px rgba(79, 172, 254, 0.4);
+}
+
 .add-btn:hover,
-.bulk-btn:hover {
+.bulk-btn:hover,
+.shuffle-btn:hover {
   transform: translateY(-2px);
 }
 
@@ -88,6 +95,10 @@ body {
 
 .bulk-btn:hover {
   box-shadow: 0 6px 20px rgba(240, 147, 251, 0.6);
+}
+
+.shuffle-btn:hover {
+  box-shadow: 0 6px 20px rgba(79, 172, 254, 0.6);
 }
 
 .form-container {
@@ -433,7 +444,8 @@ body {
   }
 
   .add-btn,
-  .bulk-btn {
+  .bulk-btn,
+  .shuffle-btn {
     flex: 1;
   }
 

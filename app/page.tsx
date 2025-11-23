@@ -119,6 +119,13 @@ export default function Home() {
     setShowAnswer(false)
   }
 
+  const shuffleCards = () => {
+    const shuffled = [...flashcards].sort(() => Math.random() - 0.5)
+    setFlashcards(shuffled)
+    setCurrentIndex(0)
+    setShowAnswer(false)
+  }
+
   if (loading) {
     return <div className="loading">Loading...</div>
   }
@@ -146,6 +153,11 @@ export default function Home() {
           >
             {showBulkForm ? '✕ Close' : '📦 Bulk Import'}
           </button>
+          {flashcards.length > 0 && (
+            <button className="shuffle-btn" onClick={shuffleCards}>
+              🔀 Shuffle
+            </button>
+          )}
         </div>
       </header>
 
