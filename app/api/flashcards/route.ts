@@ -37,3 +37,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Failed to create flashcard' }, { status: 500 })
   }
 }
+
+export async function DELETE() {
+  try {
+    await prisma.flashcard.deleteMany({})
+    return NextResponse.json({ message: 'All flashcards deleted successfully' })
+  } catch (error) {
+    return NextResponse.json({ error: 'Failed to delete flashcards' }, { status: 500 })
+  }
+}

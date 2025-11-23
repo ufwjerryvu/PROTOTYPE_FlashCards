@@ -105,6 +105,20 @@ export default function Home() {
     }
   }
 
+  const handleDeleteAll = async () => {
+    if (!confirm('Are you sure you want to delete ALL flashcards? This cannot be undone!')) {
+      return
+    }
+    try {
+      await fetch('/api/flashcards', { method: 'DELETE' })
+      fetchFlashcards()
+      setCurrentIndex(0)
+      setShowAnswer(false)
+    } catch (error) {
+      console.error('Error deleting all flashcards:', error)
+    }
+  }
+
   const renderContent = (text: string) => (
     <ReactMarkdown remarkPlugins={[remarkMath, remarkGfm]} rehypePlugins={[rehypeKatex]}>
       {text}
@@ -161,9 +175,14 @@ export default function Home() {
             {showBulkForm ? '✕ Close' : '📦 Bulk Import'}
           </button>
           {flashcards.length > 0 && (
-            <button className="shuffle-btn" onClick={shuffleCards}>
-              🔀 Shuffle
-            </button>
+            <>
+              <button className="shuffle-btn" onClick={shuffleCards}>
+                🔀 Shuffle
+              </button>
+              <button className="delete-all-btn" onClick={handleDeleteAll}>
+                🗑️ Delete All
+              </button>
+            </>
           )}
         </div>
       </header>
