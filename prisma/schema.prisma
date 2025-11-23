@@ -11,5 +11,6 @@ model Flashcard {
   id        Int      @id @default(autoincrement())
   question  String
   answer    String
+  category  String?
   createdAt DateTime @default(now())
 }

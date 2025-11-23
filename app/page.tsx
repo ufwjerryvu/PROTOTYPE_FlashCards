@@ -11,6 +11,7 @@ type Flashcard = {
   id: number
   question: string
   answer: string
+  category?: string
   createdAt: string
 }
 
@@ -20,7 +21,8 @@ export default function Home() {
   const [showAnswer, setShowAnswer] = useState(false)
   const [showForm, setShowForm] = useState(false)
   const [showBulkForm, setShowBulkForm] = useState(false)
-  const [newCard, setNewCard] = useState({ question: '', answer: '' })
+  const [newCard, setNewCard] = useState({ question: '', answer: '', category: '' })
+  const [selectedCategory, setSelectedCategory] = useState<string>('all')
   const [bulkJson, setBulkJson] = useState('')
   const [bulkError, setBulkError] = useState('')
   const [loading, setLoading] = useState(true)
@@ -49,7 +51,7 @@ export default function Home() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newCard)
       })
-      setNewCard({ question: '', answer: '' })
+      setNewCard({ question: '', answer: '', category: '' })
       setShowForm(false)
       fetchFlashcards()
     } catch (error) {
@@ -110,21 +112,26 @@ export default function Home() {
   )
 
   const nextCard = () => {
-    setCurrentIndex((prev) => (prev + 1) % flashcards.length)
+    setCurrentIndex((prev) => (prev + 1) % filteredCards.length)
     setShowAnswer(false)
   }
 
   const prevCard = () => {
-    setCurrentIndex((prev) => (prev - 1 + flashcards.length) % flashcards.length)
+    setCurrentIndex((prev) => (prev - 1 + filteredCards.length) % filteredCards.length)
     setShowAnswer(false)
   }
 
   const shuffleCards = () => {
-    const shuffled = [...flashcards].sort(() => Math.random() - 0.5)
+    const shuffled = [...filteredCards].sort(() => Math.random() - 0.5)
     setFlashcards(shuffled)
     setCurrentIndex(0)
     setShowAnswer(false)
   }
+
+  const categories = Array.from(new Set(flashcards.map(card => card.category || 'Uncategorized')))
+  const filteredCards = selectedCategory === 'all'
+    ? flashcards
+    : flashcards.filter(card => (card.category || 'Uncategorized') === selectedCategory)
 
   if (loading) {
     return <div className="loading">Loading...</div>
@@ -194,6 +201,15 @@ export default function Home() {
                 </div>
               )}
             </div>
+            <div className="form-group">
+              <label>Category (optional)</label>
+              <input
+                type="text"
+                value={newCard.category}
+                onChange={(e) => setNewCard({ ...newCard, category: e.target.value })}
+                placeholder="E.g., Math, Science, History"
+              />
+            </div>
             <button type="submit" className="submit-btn">
               Add Flashcard
             </button>
@@ -209,7 +225,7 @@ export default function Home() {
               <textarea
                 value={bulkJson}
                 onChange={(e) => setBulkJson(e.target.value)}
-                placeholder={`[\n  {"question": "What is $E = mc^2$?", "answer": "Einstein's mass-energy equivalence"},\n  {"question": "Solve $$x^2 = 4$$", "answer": "$$x = \\\\pm 2$$"}\n]`}
+                placeholder={`[\n  {"question": "What is $E = mc^2$?", "answer": "Einstein's mass-energy equivalence", "category": "Physics"},\n  {"question": "Solve $$x^2 = 4$$", "answer": "$$x = \\\\pm 2$$", "category": "Math"}\n]`}
                 required
                 rows={15}
                 style={{ fontFamily: 'monospace', fontSize: '0.9rem' }}
@@ -234,8 +250,22 @@ export default function Home() {
 
       {flashcards.length > 0 ? (
         <div className="flashcard-container">
+          <div className="category-filter">
+            <label>Filter by category:</label>
+            <select value={selectedCategory} onChange={(e) => {
+              setSelectedCategory(e.target.value)
+              setCurrentIndex(0)
+              setShowAnswer(false)
+            }}>
+              <option value="all">All Categories</option>
+              {categories.map(cat => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
+            </select>
+          </div>
+
           <div className="card-counter">
-            Card {currentIndex + 1} of {flashcards.length}
+            Card {currentIndex + 1} of {filteredCards.length}
           </div>
 
           <div
@@ -246,12 +276,17 @@ export default function Home() {
               {!showAnswer ? (
                 <div className="question">
                   <div className="label">Question</div>
-                  <div className="text">{renderContent(flashcards[currentIndex].question)}</div>
+                  <div className="text">{renderContent(filteredCards[currentIndex].question)}</div>
                 </div>
               ) : (
                 <div className="answer">
                   <div className="label">Answer</div>
-                  <div className="text">{renderContent(flashcards[currentIndex].answer)}</div>
+                  <div className="text">{renderContent(filteredCards[currentIndex].answer)}</div>
+                  {filteredCards[currentIndex].category && (
+                    <div className="category-badge">
+                      {filteredCards[currentIndex].category}
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -269,7 +304,7 @@ export default function Home() {
             </button>
           </div>
 
-          <button onClick={() => handleDeleteCard(flashcards[currentIndex].id)} className="delete-btn">
+          <button onClick={() => handleDeleteCard(filteredCards[currentIndex].id)} className="delete-btn">
             🗑️ Delete Card
           </button>
         </div>
