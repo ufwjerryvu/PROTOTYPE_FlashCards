@@ -1,0 +1,32 @@
+{
+  "name": "flashcards",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "prisma generate && next build",
+    "start": "next start",
+    "lint": "next lint",
+    "postinstall": "prisma generate"
+  },
+  "dependencies": {
+    "next": "15.0.3",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "@prisma/client": "^5.22.0",
+    "react-markdown": "^9.0.1",
+    "remark-math": "^6.0.0",
+    "remark-gfm": "^4.0.0",
+    "rehype-katex": "^7.0.1",
+    "katex": "^0.16.11"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "eslint": "^8",
+    "eslint-config-next": "15.0.3",
+    "typescript": "^5",
+    "prisma": "^5.22.0"
+  }
+}
